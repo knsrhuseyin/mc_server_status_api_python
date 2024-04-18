@@ -90,3 +90,8 @@ class MCServerStatus:
         except KeyError as e:
             print("Erreur lors de la récupération des données : ", e)
             return None
+
+
+if __name__ == "__main__":
+    test = MCServerStatus("hypixel.net")
+    print(test.get_ip(), test.get_version(), test.get_online())
