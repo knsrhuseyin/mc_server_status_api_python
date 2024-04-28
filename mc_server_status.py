@@ -1,6 +1,17 @@
 import requests
 
 
+def verification(dicte: dict):
+    try:
+        return dicte
+    except requests.RequestException as e:
+        print("Erreur lors de la connexion au serveur : ", e)
+        return
+    except KeyError as e:
+        print("Erreur lors de la récupération des données : ", e)
+        return None
+
+
 class MCServerStatus:
     __url_api = "https://api.mcsrvstat.us"
 
@@ -22,8 +33,9 @@ class MCServerStatus:
 
     def get_info_server(self, simple=False):
         try:
-            return requests.get(self.__simple_status_access) if simple else (requests.get(self.__server_status_access)
-                                                                             .json())
+            return requests.get(self.__simple_status_access).text if simple else (
+                requests.get(self.__server_status_access)
+                .json())
         except requests.RequestException as e:
             print("Erreur lors de la connexion au serveur : ", e)
             return
@@ -71,9 +83,9 @@ class MCServerStatus:
             print("Erreur lors de la récupération des données : ", e)
             return None
 
-    def get_debug(self, option):
+    def get_debug(self, option=None):
         try:
-            return self.get_info_server()["debug"][option]
+            return self.get_info_server()["debug"] if option is None else self.get_info_server()["debug"][option]
         except self.__request_exception as e:
             print("Erreur lors de la récupération des données : ", e)
             return None
@@ -91,7 +103,18 @@ class MCServerStatus:
             print("Erreur lors de la récupération des données : ", e)
             return None
 
+    def get_debug_dns(self):
+        try:
+            return self.get_debug()
+        except self.__request_exception as e:
+            print("Erreur lors de la récupération des données : ", e)
+            return None
+        except KeyError as e:
+            print("Erreur lors de la récupération des données : ", e)
+            return None
+
 
 if __name__ == "__main__":
     test = MCServerStatus("hypixel.net")
-    print(test.get_ip(), test.get_version(), test.get_online())
+    print(test.get_ip(), test.get_version(), test.get_online(), test.get_hostname(), test.get_port(),
+          test.get_online(True), test.get_api_address_complete(), test.get_debug('dns')["error"]["srv"]["message"])
